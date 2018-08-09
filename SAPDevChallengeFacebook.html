@@ -1,0 +1,157 @@
+<html>
+  <body>
+  <title>Best day ever</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+  body {
+      font:   px Montserrat, sans-serif;
+      line-height: 1.8;
+      color: #f5f6f7;
+  }
+  h1{
+  font-weight: bold;
+  }
+  p {font-size: 16px;}
+  .margin {margin-bottom: 20px;
+  font-size: 40px;
+  font-weight: bold;}
+  .bg-1 { 
+      background-color: #1abc9c; /* Green */
+      color: #ffffff;
+    text-align: center;
+  }
+
+  .bg-2 { 
+      background-color: #2f2f2f; /* Black Gray */
+      color: #fff;
+  }
+  .container-fluid {
+      padding-top: 30px;
+      padding-bottom: 30px;
+  }
+
+  
+
+  </style>
+</head>
+<body>
+
+
+<!-- First Container -->
+<div class="container-fluid bg-1 text-center">
+  <h3 class="margin">Find out Your best day ever!</h3>
+  <img src="https://res.cloudinary.com/teepublic/image/private/s--D_8jszVe--/t_Preview/b_rgb:5e366e,c_limit,f_jpg,h_630,q_90,w_630/v1486824820/production/designs/1208170_1.jpg" class="img-responsive img-circle margin" style="display:inline" alt="Best day" width="350" height="350">
+  <p><img src="" id="images" ></p>
+  <div class="fb-login-button" scope="public_profile,email" onlogin="checkLoginState();" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true"></div>
+  <h1><span id="bestDayDateText"></span><span id="bestDayDate"></span></h1>
+  <h1><span id="maxLikesText"></span><span id="maxLikes"></span></h1>
+</div>
+  <!-- Footer -->
+<footer class="container-fluid bg-2 text-center">
+  <p>Disclaimer - The number of likes you got does not represent happiness in any way.</p>
+  <p> P.S. The meaning of life is 42, not the amount of likes you got on facebook</p>
+  <p> Made by Guy Erez & Royi Rassin</p>
+</footer>
+
+  <script>
+
+    var myBestDay = null;
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '493178611147388',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v3.1'
+      });};
+
+    function checkLoginState() {
+		FB.getLoginStatus(function(response) {
+      FB.api('/me/posts?limit=200','GET',{"fields":"likes.summary(true),shares,comments.summary(true),reactions.summary(true),link"}, showMyBestDay)})
+	}
+
+	function findMyBestDay(response) {
+   var maxScore = 0;
+	 var photo;
+   var linkToPost = null;
+
+    for (var i in response.data) {
+      var post = response.data[i];
+      var currScore = evalScore(post);
+
+      if (maxScore < currScore) {
+          maxScore = currScore;
+          linkToPost = post.link;
+      }
+    }
+    return linkToPost;
+  }
+
+  function getMyBestDay(response) {
+
+    if(myBestDay == null) {
+      myBestDay = findMyBestDay(response);
+    }
+    return myBestDay;
+
+  }
+  function showMyBestDay(response) {
+    if(myBestDay == null) {
+      myBestDay = findMyBestDay(response)
+    }
+    window.open(myBestDay, "_self");
+  }
+ 
+
+
+  (function(d, s, id) {
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+   
+   // helpful functions
+   function getNumLikes(post) {
+    var numLikes = post.likes.summary.total_count;
+ 
+      if(numLikes == null) {
+        return 0;
+      }
+      else {
+        return numLikes;
+      }
+
+   }
+
+   function getNumComments(post) {
+    var numComments = post.comments.summary.total_count;
+ 
+      if(numComments == null) {
+        return 0;
+      }
+      else {
+        return numComments;
+      }
+   }
+   function getNumReactions(post) {
+    var reactions = post.reactions.summary.total_count;
+  
+      if(reactions == null) {
+        return 0;
+      }
+      else {
+        return reactions;
+      }
+   }
+   function evalScore(post) {
+      return getNumLikes(post) + getNumComments(post) + getNumReactions(post);
+   }
+</script>
+</body>
+</html>
